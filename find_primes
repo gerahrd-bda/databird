@@ -33,4 +33,4 @@ end_time = time.time()
 print(primes)
 
 # Print the duration
-print(f"Time taken: {end_time - start_time} seconds")
+print(f"Time taken: {end_time - start_time:.5f} seconds")
