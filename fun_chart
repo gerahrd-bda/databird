@@ -2,6 +2,12 @@ import pandas as pd
 import plotly.express as px
 from dash import Dash, dcc, html
 
+"""
+My interactive 3D Dashboard takes you on a ride through the data, offering a fresh perspective on those dry numbers. 
+It’s not perfect, but it sure makes spotting trends and outliers easier and more fun. 
+It’s a handy tool that adds a bit of flair to data analysis, though it's still just a glimpse of what’s beneath the surface.
+"""
+
 # Define the updated data for the DataFrame (three times bigger)
 data = {
     'A': [3, 6, 9, 12, 15],
