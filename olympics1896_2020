@@ -1,9 +1,9 @@
 Python code to analyze and predict Olympic Athletes Data, 
 I got the a CSV dataset "athlete_events.csv" about the Olympics since 1896 to 2020 from "www.kaggle.com".
 
-My program is all about diving into the Olympic athletes dataset to find patterns and predict incomes. 
-I used pandas, matplotlib, seaborn, plotly, and scikit-learn, plus I created an interactive dashboard using Dash. 
-Let's walk through it step-by-step, and I'll try to keep it simple.
+My program is diving into the Olympic athletes dataset to find patterns and predict incomes. 
+I used pandas, matplotlib, seaborn, plotly, and scikit-learn, plus I created interactive dashboard using Dash. 
+Let's walk through it step-by-step, and try to keep it simple.
 
 
 Step 1: Load and preprocess the data
@@ -174,7 +174,7 @@ def plot_histograms(df):
     numeric_df.hist(bins=30, figsize=(15, 10))  # Bigger bins, bigger picture
     plt.show()  # Ta-da!
 
-# Correlation matrix time. Let's see how these numbers relate to each other
+# Correlation matrix time. and see how these numbers relate to each other
 def plot_correlation_matrix(df):
     numeric_df = df.select_dtypes(include=['float64', 'int64'])
     plt.figure(figsize=(12, 8))  # Gotta have a big canvas for all that data
@@ -187,7 +187,7 @@ def plot_pairplot(df):
     sns.pairplot(df)
     plt.show()
 
-# Now for the fun part: creating an interactive dashboard with Dash!
+# Now for the fun part, creating an interactive dashboard with Dash, of course!
 def create_dash_app(df):
     app = Dash(__name__)
 
@@ -231,21 +231,23 @@ def train_and_evaluate(df):
     # Splitting the data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Training a linear regression model... fingers crossed
+    # Training a linear regression model... fingers crossed 
     model = LinearRegression()
     model.fit(X_train, y_train)
 
     # Making predictions on the test set
     y_pred = model.predict(X_test)
 
-    # Evaluating the model – let's see how we did
+    # Evaluating the model and see how it works
     mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
 
-    print(f'Mean Squared Error: {mse}')  # Could be worse, could be better...
-    print(f'R^2 Score: {r2}')  # How well did we do? Only one way to find out
+    print(f'Mean Squared Error: {mse}')  
+    # Could be worse, could be better...
+    print(f'R^2 Score: {r2}')  
+    # How well did we do? Only one way to find out!
 
-    # Plotting the actual vs predicted weights – hope it's not too embarrassing
+    # Plotting the actual vs predicted weights... hope it's not too embarrassing
     plt.figure(figsize=(10, 6))
     plt.scatter(y_test, y_pred, alpha=0.5)
     plt.xlabel('Actual Weight')
@@ -260,19 +262,19 @@ if __name__ == '__main__':
     # Let's handle those missing values
     df = handle_missing_values(df)
 
-    # Time to make some histograms
+    # Time to make some nice histograms
     plot_histograms(df)
 
-    # And now for the correlation matrix
+    # now for the correlation matrix
     plot_correlation_matrix(df)
 
     # Let's see all those pairwise relationships
     plot_pairplot(df)
 
-    # Train the model and evaluate it – hope it doesn't blow up
+    # Train the model and evaluate it, hope it doesn't blow up
     train_and_evaluate(df)
 
-    # Finally, let's create and run our Dash app
+    # Finally, let's create and run the Dash app
     app = create_dash_app(df)
     app.run_server(debug=True)
 
