@@ -1,0 +1,279 @@
+Python code to analyze and predict Olympic Athletes Data, 
+I got the a CSV dataset "athlete_events.csv" about the Olympics since 1896 to 2020 from "www.kaggle.com".
+
+My program is diving into the Olympic athletes dataset to find patterns and predict incomes. 
+I used pandas, matplotlib, seaborn, plotly, and scikit-learn, plus I created interactive dashboard using Dash. 
+Let's walk through it step-by-step, and try to keep it simple.
+
+
+Step 1: Load and preprocess the data
+First, I loaded the data from a CSV file and clean it up. 
+I made it sure the date column is in the right format and handle any missing values by dropping them:
+
+import pandas as pd 
+# Load the CSV file 
+file_path = '/dataset/athlete_events.csv' 
+df = pd.read_csv(file_path) 
+# Check the data 
+print(df.info()) 
+print(df.head()) 
+# Handle missing values 
+df = df.dropna()
+
+
+Step 2: Exploratory Data Analysis (EDA)
+Now, wanted to understand the data, looked at some basic statistics and visualized distributions with histograms, 
+and also created a correlation matrix to see how variables relate to each other:
+
+# Descriptive statistics
+print(df.describe())
+
+# Numeric columns for correlation
+numeric_df = df.select_dtypes(include=['float64', 'int64'])
+
+# Histograms
+numeric_df.hist(bins=30, figsize=(15, 10))
+plt.show()
+
+# Correlation matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(12, 8))
+sns.heatmap(numeric_df.corr(), annot=True, cmap='coolwarm')
+plt.title('Correlation Matrix')
+plt.show()
+
+
+Step 3: Visualizing Data
+Used Plotly to create interactive visualizations. 
+These are added to a Dash app for an interactive dashboard:
+
+import plotly.express as px
+from dash import Dash, html, dcc
+
+# Example visualizations
+fig1 = px.histogram(df, x='Age', title='Age Distribution of Athletes')
+fig2 = px.box(df, x='Sex', y='Height', title='Height Distribution by Gender')
+fig3 = px.scatter(df, x='Height', y='Weight', color='Sex', title='Height vs Weight by Gender')
+
+# Dash application
+app = Dash(__name__)
+
+app.layout = html.Div(children=[
+    html.H1(children='Olympic Athletes Analysis Dashboard'),
+
+    html.Div(children='''
+        An interactive dashboard to analyze the athlete events dataset.
+    '''),
+
+    dcc.Graph(
+        id='age-distribution',
+        figure=fig1
+    ),
+    dcc.Graph(
+        id='height-distribution-gender',
+        figure=fig2
+    ),
+    dcc.Graph(
+        id='height-weight-gender',
+        figure=fig3
+    )
+])
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
+
+
+Step 4: Building a Predictive Model
+I want to predict athletes' weights based on height and age, 
+using scikit-learn's LinearRegression, I trained my model and evaluated its performance:
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Predicting Weight based on Height and Age
+X = df[['Height', 'Age']]
+y = df['Weight']
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Predictions
+y_pred = model.predict(X_test)
+
+# Evaluate the model
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f'Mean Squared Error: {mse}')
+print(f'R^2 Score: {r2}')
+
+
+Step 5: Visualizing Model Predictions
+I compared the model's predictions with the actual values to see how well it performed:
+
+# Plot predictions vs actual values
+plt.figure(figsize=(10, 6))
+plt.scatter(y_test, y_pred, alpha=0.5)
+plt.xlabel('Actual Weight')
+plt.ylabel('Predicted Weight')
+plt.title('Actual vs Predicted Weight')
+plt.show()
+
+
+Summary
+So, what I did achieve:
+
+    1. Loaded and cleaned the data - Basic stuff, but essential.
+    2. Explored the data - Looked at statistics and correlations to get a feel for what's going on.
+    3. Visualized the data - Created some neat graphs and put them in a dashboard.
+    4. Built a predictive model - Tried to predict athletes' weights using height and age.
+    5. Evaluated the model - Checked how well our predictions matched reality.
+
+There's always room for improvement. The model could be more sophisticated, and we could explore more features. 
+But this gives me a good start on how to tackle such a dataset.
+If you're interested in the code, running the Dash app, or diving deeper into predictive analytics, 
+you now have a solid foundation to build on.
+
+
+Here, I put the full code with a few changes thanks to the help of my friends ;-)
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import plotly.express as px
+from dash import Dash, html, dcc
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Hey there, let's load this CSV file and see what kind of data we're dealing with
+file_path = '/dataset/athlete_events.csv'
+df = pd.read_csv(file_path)
+
+# Okay, let's get some basic info about our dataframe and take a sneak peek at the data
+def display_basic_info(df):
+    print(df.info())  # This should tell us what we're working with... I hope
+    print(df.head())  # Always good to see the first few rows
+    print(df.describe())  # Let's get some summary stats
+    print(df.isnull().sum())  # And check for any pesky missing values
+
+# Time to deal with those missing values... let's just drop them all and hope for the best
+def handle_missing_values(df):
+    return df.dropna()  # Not the most sophisticated approach, but hey, it works!
+
+# Let's make some histograms to see how our numeric data is distributed
+def plot_histograms(df):
+    numeric_df = df.select_dtypes(include=['float64', 'int64'])
+    numeric_df.hist(bins=30, figsize=(15, 10))  # Bigger bins, bigger picture
+    plt.show()  # Ta-da!
+
+# Correlation matrix time. and see how these numbers relate to each other
+def plot_correlation_matrix(df):
+    numeric_df = df.select_dtypes(include=['float64', 'int64'])
+    plt.figure(figsize=(12, 8))  # Gotta have a big canvas for all that data
+    sns.heatmap(numeric_df.corr(), annot=True, cmap='coolwarm')  # Fancy colors and all
+    plt.title('Correlation Matrix')  # Titles make everything official
+    plt.show()
+
+# Pairplot! Because why not look at all possible scatter plots?
+def plot_pairplot(df):
+    sns.pairplot(df)
+    plt.show()
+
+# Now for the fun part, creating an interactive dashboard with Dash, of course!
+def create_dash_app(df):
+    app = Dash(__name__)
+
+    # Here we go with some Plotly Express magic
+    fig1 = px.histogram(df, x='Age', title='Age Distribution of Athletes')
+    fig2 = px.box(df, x='Sex', y='Height', title='Height Distribution by Gender')
+    fig3 = px.scatter(df, x='Height', y='Weight', color='Sex', title='Height vs Weight by Gender')
+
+    # Let's add some more sophisticated stuff while we're at it
+    medal_counts = df[df['Medal'].notna()].groupby(['NOC', 'Medal']).size().reset_index(name='Counts')
+    fig4 = px.treemap(medal_counts, path=['NOC', 'Medal'], values='Counts', title='Medal Distribution by Country and Type')
+
+    age_dist_sports = px.histogram(df, x='Age', color='Sport', nbins=20, title='Age Distribution by Sport', barmode='overlay')
+
+    fig5 = px.sunburst(df[df['Medal'].notna()], path=['NOC', 'Sport', 'Medal'], title='Sunburst of Medals by Country and Sport')
+
+    # Setting up the layout of our Dash app
+    app.layout = html.Div(children=[
+        html.H1(children='Olympic Athletes Analysis Dashboard'),
+        html.Div(children='An interactive dashboard to analyze the athlete events dataset.'),
+        dcc.Graph(id='age-distribution', figure=fig1),
+        dcc.Graph(id='height-distribution-gender', figure=fig2),
+        dcc.Graph(id='height-weight-gender', figure=fig3),
+        dcc.Graph(id='medal-distribution', figure=fig4),
+        dcc.Graph(id='age-dist-sports', figure=age_dist_sports),
+        dcc.Graph(id='sunburst-medals', figure=fig5)
+    ])
+
+    return app
+
+# Time to get serious: let's train a model and see if it actually works
+def train_and_evaluate(df):
+    required_columns = ['Height', 'Age', 'Weight']
+    if not all(col in df.columns for col in required_columns):
+        raise KeyError(f"One or more required columns are missing: {required_columns}")
+
+    # Gonna try to predict Weight based on Height and Age... wish me luck :-)
+    X = df[['Height', 'Age']]
+    y = df['Weight']
+
+    # Splitting the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Training a linear regression model... fingers crossed 
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+
+    # Making predictions on the test set
+    y_pred = model.predict(X_test)
+
+    # Evaluating the model and see how it works
+    mse = mean_squared_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
+
+    print(f'Mean Squared Error: {mse}')  
+    # Could be worse, could be better...
+    print(f'R^2 Score: {r2}')  
+    # How well did we do? Only one way to find out!
+
+    # Plotting the actual vs predicted weights... hope it's not too embarrassing
+    plt.figure(figsize=(10, 6))
+    plt.scatter(y_test, y_pred, alpha=0.5)
+    plt.xlabel('Actual Weight')
+    plt.ylabel('Predicted Weight')
+    plt.title('Actual vs Predicted Weight')
+    plt.show()
+
+if __name__ == '__main__':
+    # Start by displaying some basic info about the dataset
+    display_basic_info(df)
+
+    # Let's handle those missing values
+    df = handle_missing_values(df)
+
+    # Time to make some nice histograms
+    plot_histograms(df)
+
+    # now for the correlation matrix
+    plot_correlation_matrix(df)
+
+    # Let's see all those pairwise relationships
+    plot_pairplot(df)
+
+    # Train the model and evaluate it, hope it doesn't blow up
+    train_and_evaluate(df)
+
+    # Finally, let's create and run the Dash app
+    app = create_dash_app(df)
+    app.run_server(debug=True)
