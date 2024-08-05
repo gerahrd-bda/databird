@@ -126,6 +126,7 @@ plt.ylabel('Predicted Weight')
 plt.title('Actual vs Predicted Weight')
 plt.show()
 
+
 Summary
 So, what I did achieve:
 
@@ -153,62 +154,83 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 
 # Load the CSV file
-file_path = '/home/edson/preddraws/events_mws/events_mws_filter.csv'
+file_path = '/dataset/athlete_events.csv'
 df = pd.read_csv(file_path)
 
-# Rename columns for clarity
-df.rename(columns={
-    'OLLAMA': 'Age',
-    'BL1': 'Sex',
-    'BL2': 'Height',
-    'BL3': 'Weight',
-    'BL4': 'Feature4',
-    'BL5': 'Feature5',
-    'ST1': 'Feature6'  # Replace with appropriate name if necessary
-}, inplace=True)
 
 # Display basic information about the dataframe
-print(df.info())
-print(df.head())
+def display_basic_info(df):
+    print(df.info())
+    print(df.head())
+    print(df.describe())
+    print(df.isnull().sum())
 
-# Check for and handle missing values
-print(df.isnull().sum())
-df = df.dropna()  # For simplicity, drop all rows with missing values
 
-# Descriptive statistics
-print(df.describe())
+# Handle missing values
+def handle_missing_values(df):
+    return df.dropna()
 
-# Numeric columns for correlation
-numeric_df = df.select_dtypes(include=['float64', 'int64'])
 
-# Histograms
-numeric_df.hist(bins=30, figsize=(15, 10))
-plt.show()
+# Plot histograms for numeric columns
+def plot_histograms(df):
+    numeric_df = df.select_dtypes(include=['float64', 'int64'])
+    numeric_df.hist(bins=30, figsize=(15, 10))
+    plt.show()
 
-# Correlation matrix
-plt.figure(figsize=(12, 8))
-sns.heatmap(numeric_df.corr(), annot=True, cmap='coolwarm')
-plt.title('Correlation Matrix')
-plt.show()
 
-# Example visualizations
-fig1 = px.histogram(df, x='Age', title='Age Distribution of Athletes')
-fig2 = px.box(df, x='Sex', y='Height', title='Height Distribution by Gender')
-fig3 = px.scatter(df, x='Height', y='Weight', color='Sex', title='Height vs Weight by Gender')
+# Plot correlation matrix
+def plot_correlation_matrix(df):
+    numeric_df = df.select_dtypes(include=['float64', 'int64'])
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(numeric_df.corr(), annot=True, cmap='coolwarm')
+    plt.title('Correlation Matrix')
+    plt.show()
 
-# Dash application
-app = Dash(__name__)
 
-app.layout = html.Div(children=[
-    html.H1(children='Olympic Athletes Analysis Dashboard'),
-    html.Div(children='An interactive dashboard to analyze the athlete events dataset.'),
-    dcc.Graph(id='age-distribution', figure=fig1),
-    dcc.Graph(id='height-distribution-gender', figure=fig2),
-    dcc.Graph(id='height-weight-gender', figure=fig3)
-])
+# Additional analyses: Pairplot
+def plot_pairplot(df):
+    sns.pairplot(df)
+    plt.show()
+
+
+# Dash application for interactive visualizations
+def create_dash_app(df):
+    app = Dash(__name__)
+
+    # Example visualizations
+    fig1 = px.histogram(df, x='Age', title='Age Distribution of Athletes')
+    fig2 = px.box(df, x='Sex', y='Height', title='Height Distribution by Gender')
+    fig3 = px.scatter(df, x='Height', y='Weight', color='Sex', title='Height vs Weight by Gender')
+
+    # Additional sophisticated visualizations
+    medal_counts = df[df['Medal'].notna()].groupby(['NOC', 'Medal']).size().reset_index(name='Counts')
+    fig4 = px.treemap(medal_counts, path=['NOC', 'Medal'], values='Counts', title='Medal Distribution by Country and Type')
+
+    age_dist_sports = px.histogram(df, x='Age', color='Sport', nbins=20, title='Age Distribution by Sport', barmode='overlay')
+
+    fig5 = px.sunburst(df[df['Medal'].notna()], path=['NOC', 'Sport', 'Medal'], title='Sunburst of Medals by Country and Sport')
+
+    app.layout = html.Div(children=[
+        html.H1(children='Olympic Athletes Analysis Dashboard'),
+        html.Div(children='An interactive dashboard to analyze the athlete events dataset.'),
+        dcc.Graph(id='age-distribution', figure=fig1),
+        dcc.Graph(id='height-distribution-gender', figure=fig2),
+        dcc.Graph(id='height-weight-gender', figure=fig3),
+        dcc.Graph(id='medal-distribution', figure=fig4),
+        dcc.Graph(id='age-dist-sports', figure=age_dist_sports),
+        dcc.Graph(id='sunburst-medals', figure=fig5)
+    ])
+
+    return app
+
 
 # Model Training and Evaluation
 def train_and_evaluate(df):
+    # Ensure that 'Height', 'Age', and 'Weight' columns exist
+    required_columns = ['Height', 'Age', 'Weight']
+    if not all(col in df.columns for col in required_columns):
+        raise KeyError(f"One or more required columns are missing: {required_columns}")
+
     # Predicting Weight based on Height and Age
     X = df[['Height', 'Age']]
     y = df['Weight']
@@ -238,7 +260,26 @@ def train_and_evaluate(df):
     plt.title('Actual vs Predicted Weight')
     plt.show()
 
-# Run the Dash app and train the model if the script is run directly
+
 if __name__ == '__main__':
+    # Display basic information
+    display_basic_info(df)
+
+    # Handle missing values
+    df = handle_missing_values(df)
+
+    # Plot histograms
+    plot_histograms(df)
+
+    # Plot correlation matrix
+    plot_correlation_matrix(df)
+
+    # Additional analyses
+    plot_pairplot(df)
+
+    # Train and evaluate model
     train_and_evaluate(df)
+
+    # Create and run Dash app
+    app = create_dash_app(df)
     app.run_server(debug=True)
