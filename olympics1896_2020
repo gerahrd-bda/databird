@@ -1,63 +1,58 @@
+Python code to analyze and predict Olympic Athletes Data, 
 I got the a CSV dataset "athlete_events.csv" about the Olympics since 1896 to 2020 from "www.kaggle.com".
 
-To analyze the CSV file and extract patterns and insights, 
-I utilized several Python libraries such as pandas, matplotlib, seaborn, and scikit-learn.
-I also created a dashboard using Plotly and Dash to visualize the data interactively.
+My program is all about diving into the Olympic athletes dataset to find patterns and predict incomes. 
+I used pandas, matplotlib, seaborn, plotly, and scikit-learn, plus I created an interactive dashboard using Dash. 
+Let's walk through it step-by-step, and I'll try to keep it simple.
 
-Here is the Python program that covered the data analysis:
 
-Data loading and preprocessing
-Exploratory data analysis (EDA)
-Visualization and dashboard
-Predictive modeling
+Step 1: Load and preprocess the data
+First, I loaded the data from a CSV file and clean it up. 
+I made it sure the date column is in the right format and handle any missing values by dropping them:
 
-First, I loaded and inspected the data:
+import pandas as pd 
+# Load the CSV file 
+file_path = '/dataset/athlete_events.csv' 
+df = pd.read_csv(file_path) 
+# Check the data 
+print(df.info()) 
+print(df.head()) 
+# Handle missing values 
+df = df.dropna()
 
-import pandas as pd
 
-# Load the CSV file
-file_path = '/olympics_1896_2020/athlete_events.csv'
-df = pd.read_csv(file_path)
-
-# Display basic information about the dataframe
-print(df.info())
-print(df.head())
-
-Next, I performed some basic data cleaning and preprocessing:
-
-# Convert date columns to datetime if necessary
-# df['DATE'] = pd.to_datetime(df['DATE'], format='%d/%m/%Y')
-
-# Check for missing values
-print(df.isnull().sum())
-
-# Handle missing values (e.g., fill with mean/median or drop)
-df = df.dropna()  # For simplicity, drop all rows with missing values
-
-EDA:
-
-import matplotlib.pyplot as plt
-import seaborn as sns
+Step 2: Exploratory Data Analysis (EDA)
+Now, wanted to understand the data, looked at some basic statistics and visualized distributions with histograms, 
+and also created a correlation matrix to see how variables relate to each other:
 
 # Descriptive statistics
 print(df.describe())
 
-# Histogram of numerical columns
-df.hist(bins=30, figsize=(15, 10))
+# Numeric columns for correlation
+numeric_df = df.select_dtypes(include=['float64', 'int64'])
+
+# Histograms
+numeric_df.hist(bins=30, figsize=(15, 10))
 plt.show()
 
 # Correlation matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 plt.figure(figsize=(12, 8))
-sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
+sns.heatmap(numeric_df.corr(), annot=True, cmap='coolwarm')
 plt.title('Correlation Matrix')
 plt.show()
 
-Visualization and dashboard using Plotly and Dash:
+
+Step 3: Visualizing Data
+Used Plotly to create interactive visualizations. 
+These are added to a Dash app for an interactive dashboard:
+
 import plotly.express as px
-import plotly.graph_objects as go
 from dash import Dash, html, dcc
 
-# Example Plotly visualizations
+# Example visualizations
 fig1 = px.histogram(df, x='Age', title='Age Distribution of Athletes')
 fig2 = px.box(df, x='Sex', y='Height', title='Height Distribution by Gender')
 fig3 = px.scatter(df, x='Height', y='Weight', color='Sex', title='Height vs Weight by Gender')
@@ -88,25 +83,28 @@ app.layout = html.Div(children=[
 
 if __name__ == '__main__':
     app.run_server(debug=True)
-	
-	
-Predictive modeling:
+
+
+Step 4: Building a Predictive Model
+I want to predict athletes' weights based on height and age, 
+using scikit-learn's LinearRegression, I trained my model and evaluated its performance:
+
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 
-# Example: Predicting Weight based on Height and Age
+# Predicting Weight based on Height and Age
 X = df[['Height', 'Age']]
 y = df['Weight']
 
-# Split the data into training and testing sets
+# Split data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Initialize and train the model
+# Train the model
 model = LinearRegression()
 model.fit(X_train, y_train)
 
-# Make predictions
+# Predictions
 y_pred = model.predict(X_test)
 
 # Evaluate the model
@@ -116,7 +114,11 @@ r2 = r2_score(y_test, y_pred)
 print(f'Mean Squared Error: {mse}')
 print(f'R^2 Score: {r2}')
 
-# Plot the predictions vs actual values
+
+Step 5: Visualizing Model Predictions
+I compared the model's predictions with the actual values to see how well it performed:
+
+# Plot predictions vs actual values
 plt.figure(figsize=(10, 6))
 plt.scatter(y_test, y_pred, alpha=0.5)
 plt.xlabel('Actual Weight')
@@ -124,35 +126,22 @@ plt.ylabel('Predicted Weight')
 plt.title('Actual vs Predicted Weight')
 plt.show()
 
+Summary
+So, what I did achieve:
 
-Explanation: Data loading and preprocessing:
+    1. Loaded and cleaned the data - Basic stuff, but essential.
+    2. Explored the data - Looked at statistics and correlations to get a feel for what's going on.
+    3. Visualized the data - Created some neat graphs and put them in a dashboard.
+    4. Built a predictive model - Tried to predict athletes' weights using height and age.
+    5. Evaluated the model - Checked how well our predictions matched reality.
 
-Loaded the CSV file.
-Display basic information about the DataFrame.
-
-Handled missing values by dropping rows with any missing data.
-
-EDA:
-
-Calculated descriptive statistics.
-Filtered out non-numeric columns for the correlation matrix.
-Plotted histograms of numerical columns.
-Generated a correlation matrix and visualized it using seaborn's heatmap.
-
-Visualization:
-
-Created interactive visualizations using Plotly and build a Dash application.
-
-Predictive Modeling:
-
-Trained a simple linear regression model to predict athlete weight based on height and age.
-Evaluatet the model and plot the predictions against actual values.
-By excluding non-numeric columns from the correlation matrix calculation, 
-the program worked well without errors and provided meaningful insights into the data.
+There's always room for improvement. The model could be more sophisticated, and we could explore more features. 
+But this gives me a good start on how to tackle such a dataset.
+If you're interested in the code, running the Dash app, or diving deeper into predictive analytics, 
+you now have a solid foundation to build on.
 
 
-
-The full program below :
+Here, I put the full code with a few changes:
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -164,26 +153,35 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 
 # Load the CSV file
-file_path = '/olympics_1986_2020/athlete_events.csv'
+file_path = '/home/edson/preddraws/events_mws/events_mws_filter.csv'
 df = pd.read_csv(file_path)
+
+# Rename columns for clarity
+df.rename(columns={
+    'OLLAMA': 'Age',
+    'BL1': 'Sex',
+    'BL2': 'Height',
+    'BL3': 'Weight',
+    'BL4': 'Feature4',
+    'BL5': 'Feature5',
+    'ST1': 'Feature6'  # Replace with appropriate name if necessary
+}, inplace=True)
 
 # Display basic information about the dataframe
 print(df.info())
 print(df.head())
 
-# Check for missing values
+# Check for and handle missing values
 print(df.isnull().sum())
-
-# Handle missing values (e.g., fill with mean/median or drop)
 df = df.dropna()  # For simplicity, drop all rows with missing values
 
 # Descriptive statistics
 print(df.describe())
 
-# Filter out non-numeric columns for correlation matrix
+# Numeric columns for correlation
 numeric_df = df.select_dtypes(include=['float64', 'int64'])
 
-# Histogram of numerical columns
+# Histograms
 numeric_df.hist(bins=30, figsize=(15, 10))
 plt.show()
 
@@ -193,7 +191,7 @@ sns.heatmap(numeric_df.corr(), annot=True, cmap='coolwarm')
 plt.title('Correlation Matrix')
 plt.show()
 
-# Example Plotly visualizations
+# Example visualizations
 fig1 = px.histogram(df, x='Age', title='Age Distribution of Athletes')
 fig2 = px.box(df, x='Sex', y='Height', title='Height Distribution by Gender')
 fig3 = px.scatter(df, x='Height', y='Weight', color='Sex', title='Height vs Weight by Gender')
@@ -203,53 +201,44 @@ app = Dash(__name__)
 
 app.layout = html.Div(children=[
     html.H1(children='Olympic Athletes Analysis Dashboard'),
-
-    html.Div(children='''
-        An interactive dashboard to analyze the athlete events dataset.
-    '''),
-
-    dcc.Graph(
-        id='age-distribution',
-        figure=fig1
-    ),
-    dcc.Graph(
-        id='height-distribution-gender',
-        figure=fig2
-    ),
-    dcc.Graph(
-        id='height-weight-gender',
-        figure=fig3
-    )
+    html.Div(children='An interactive dashboard to analyze the athlete events dataset.'),
+    dcc.Graph(id='age-distribution', figure=fig1),
+    dcc.Graph(id='height-distribution-gender', figure=fig2),
+    dcc.Graph(id='height-weight-gender', figure=fig3)
 ])
 
-# Example: Predicting Weight based on Height and Age
-X = df[['Height', 'Age']]
-y = df['Weight']
+# Model Training and Evaluation
+def train_and_evaluate(df):
+    # Predicting Weight based on Height and Age
+    X = df[['Height', 'Age']]
+    y = df['Weight']
 
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Split data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Initialize and train the model
-model = LinearRegression()
-model.fit(X_train, y_train)
+    # Train the model
+    model = LinearRegression()
+    model.fit(X_train, y_train)
 
-# Make predictions
-y_pred = model.predict(X_test)
+    # Predictions
+    y_pred = model.predict(X_test)
 
-# Evaluate the model
-mse = mean_squared_error(y_test, y_pred)
-r2 = r2_score(y_test, y_pred)
+    # Evaluate the model
+    mse = mean_squared_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
 
-print(f'Mean Squared Error: {mse}')
-print(f'R^2 Score: {r2}')
+    print(f'Mean Squared Error: {mse}')
+    print(f'R^2 Score: {r2}')
 
-# Plot the predictions vs actual values
-plt.figure(figsize=(10, 6))
-plt.scatter(y_test, y_pred, alpha=0.5)
-plt.xlabel('Actual Weight')
-plt.ylabel('Predicted Weight')
-plt.title('Actual vs Predicted Weight')
-plt.show()
+    # Plot predictions vs actual values
+    plt.figure(figsize=(10, 6))
+    plt.scatter(y_test, y_pred, alpha=0.5)
+    plt.xlabel('Actual Weight')
+    plt.ylabel('Predicted Weight')
+    plt.title('Actual vs Predicted Weight')
+    plt.show()
 
+# Run the Dash app and train the model if the script is run directly
 if __name__ == '__main__':
+    train_and_evaluate(df)
     app.run_server(debug=True)
