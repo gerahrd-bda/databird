@@ -19,14 +19,15 @@ r = np.arange(0, 2, 0.01)
 # Calculate the corresponding angles for the spiral
 theta = 2 * np.pi * r
 
-# Create a colormap from seaborn
-colors = sns.color_palette("coolwarm", len(r))
-
 # Create a figure and a polar subplot
 fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
 
 # Plot the spiral with color gradient
-ax.scatter(theta, r, c=colors, s=10, cmap='coolwarm', edgecolors='none')
+scatter = ax.scatter(theta, r, c=r, s=10, cmap='coolwarm', edgecolors='none')
+
+# Add a color bar to show the color scale
+cbar = plt.colorbar(scatter, ax=ax)
+cbar.set_label('Radial Distance')
 
 # Set the radial ticks
 ax.set_rticks([0.5, 1, 1.5, 2])
@@ -34,5 +35,5 @@ ax.set_rticks([0.5, 1, 1.5, 2])
 # Enable grid
 ax.grid(True)
 
-# Show you the plot
+# Show the plot
 plt.show()
