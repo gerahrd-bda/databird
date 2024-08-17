@@ -30,7 +30,7 @@ cbar = plt.colorbar(scatter, ax=ax)
 cbar.set_label('Radial Distance')
 
 # Set the radial ticks
-ax.set_rticks([0.5, 1, 1.5, 2])
+ax.set_rticks([0.5, 1, 1.5, 2, 2.5, 3])
 
 # Enable grid
 ax.grid(True)
