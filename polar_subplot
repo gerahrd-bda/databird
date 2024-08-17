@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Created on Sat Aug 17 14:48:48 2024, with Spyder
+@author: gev
+"""
+
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Apply seaborn style
+sns.set(style="whitegrid")
+
+# Define the radial values
+r = np.arange(0, 2, 0.01)
+
+# Calculate the corresponding angles for the spiral
+theta = 2 * np.pi * r
+
+# Create a colormap from seaborn
+colors = sns.color_palette("coolwarm", len(r))
+
+# Create a figure and a polar subplot
+fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+
+# Plot the spiral with color gradient
+ax.scatter(theta, r, c=colors, s=10, cmap='coolwarm', edgecolors='none')
+
+# Set the radial ticks
+ax.set_rticks([0.5, 1, 1.5, 2])
+
+# Enable grid
+ax.grid(True)
+
+# Show you the plot
+plt.show()
